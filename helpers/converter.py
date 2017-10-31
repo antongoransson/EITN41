@@ -1,20 +1,21 @@
 import hashlib
 import binascii
+import unittest
 
-def int_to_bytes(intNbr, size = None, byteorder='big'):
+def int_to_bytes(int_nbr, size = None, byteorder='big'):
     if(size is None):
-        size = intNbr.bit_length() + 7
-    byte_array = (intNbr).to_bytes(size, byteorder=byteorder)
+        size = int_nbr.bit_length() + 7
+    byte_array = (int_nbr).to_bytes(size, byteorder=byteorder)
     return byte_array
 
-def hex_to_int(hexDecStr):
-    return int(hexDecStr, 16)
+def hex_to_int(hex_str):
+    return int(hex_str, 16)
 
 def int_to_hex(integer):
     return hex(integer)
 
-def hex_to_bytes(hexStr):
-    return binascii.unhexlify(hexStr) # converts string to byte_array
+def hex_to_bytes(hex_str):
+    return binascii.unhexlify(hex_str) # converts string to byte_array
 
 def bytes_to_hex(byte_array):
     hex_data = binascii.hexlify(byte_array)
