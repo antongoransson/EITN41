@@ -1,30 +1,34 @@
 import unittest
-
 from converter import *
 
-
-# >>> import binascii
-# >>> binascii.hexlify(bytearray(array_alpha))
-# '8535eaf1'
 class TestConverter(unittest.TestCase):
 
 
-    def test_intToBytes(self):
-        byteArray = intToByteArray(intNbr=500, size=4,  byteorder='big')
-        string = sha1HashByteArray(byteArray)
-        self.assertEqual("c6c5da207269aa4a59743ded27105b13bc8dd384", string)
+    def test_int_to_hex(self):
+        int_nbr1 = 500
+        int_nbr2 = 2897
+        byte_array1 = int_to_bytes(intNbr = int_nbr1, size = 4)
+        byte_array2 = int_to_bytes(intNbr = int_nbr2, size = 4)
+        str1 = bytes_to_hex(byte_array1)
+        str2 = bytes_to_hex(byte_array2)
 
-    def test_stringToInt(self):
-        result = hexDecToInt("fedcba9876543210")
-        hashResult = sha1HashInt(result, 8)
-        a = intToHexDec(2897)
-        byteArray = intToByteArray(intNbr=2897, size=4,  byteorder='big')
-        f = byteArrayToHex (byteArray)
-        print(f)
-        print(hashResult)
-        intResult = hexDecToInt(hashResult)
-        self.assertEqual(18364758544493064720, result)
-        self.assertEqual(946229717077375328329532411653585908948565005770, intResult)
+        self.assertEqual("000001f4", str1)
+        self.assertEqual("00000b51", str2)
+
+    def test_int_to_bytesHash(self):
+        intNbr = 500
+        byte_array = int_to_bytes(intNbr = intNbr, size = 4, byteorder='big')
+        byte_arrayHash = sha1_hash_bytes_array(byte_array)
+        self.assertEqual("c6c5da207269aa4a59743ded27105b13bc8dd384", bytes_to_hex(byte_arrayHash))
+
+    def test_string_to_int(self):
+        byte_result = hex_to_bytes("fedcba9876543210")
+        int_result = bytes_to_int(byte_result)
+        hashResult = sha1_hash_bytes_array(int_result, size = 8)
+        self.assertEqual(18364758544493064720, int_result)
+        self.assertEqual(18364758544493064720, hex_to_int("fedcba9876543210"))
+
+        self.assertEqual(946229717077375328329532411653585908948565005770, bytes_to_int(hashResult))
 
 
 
