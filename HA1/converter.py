@@ -25,7 +25,7 @@ def bytes_to_int(byte_array):
 def sha1_hash_bytes_array(byte_array, size = None):
     if(type(byte_array) is int):
         byte_array = int_to_bytes(byte_array, size)
-    if(type(byte_array) is not bytes):
-        raise Exception("Input needs to be of type bytes or int")
+    # if(type(byte_array) is not bytes):
+    #     raise Exception("Input needs to be of type bytes or int")
     hash_object = hashlib.sha1(byte_array)
     return hash_object.digest()

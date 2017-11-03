@@ -11,7 +11,7 @@ def find_value_x(card_nbr):
         if((value + 9) % 2 == 0):
             value+=9
         value/=2
-    return int(value)
+    return str(round(value))
 
 def find_index_x(card_nbr):
     for i in range(0, len((card_nbr))):
@@ -30,8 +30,8 @@ def calc_sum(card_nbr):
                 nbr -= 9
         tot_sum += nbr
     return tot_sum
-
-string = ""
-for line in fileinput.input():
-    string+=(str(find_value_x(str(line)[:-1])))
-print(string)
+if __name__ == "__main__":
+    string = ""
+    for line in fileinput.input():
+        string+=find_value_x(line[:-1])
+    print(string)
