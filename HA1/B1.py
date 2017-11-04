@@ -4,9 +4,7 @@ def find_value_x(card_nbr):
     list_nbr= list(reversed(card_nbr))
     index = find_index_x(list_nbr)
     nbr_sum = calc_sum(list_nbr)
-    value = 10 - (nbr_sum % 10)
-    if(value == 10):
-        value = 0
+    value = (10 - (nbr_sum % 10)) % 10
     if((index + 1) % 2 == 0 ):
         if((value + 9) % 2 == 0):
             value+=9
@@ -14,7 +12,7 @@ def find_value_x(card_nbr):
     return str(round(value))
 
 def find_index_x(card_nbr):
-    for i in range(0, len((card_nbr))):
+    for i in range(len((card_nbr))):
         if(card_nbr[i] == 'X'):
             return i
 
@@ -30,6 +28,7 @@ def calc_sum(card_nbr):
                 nbr -= 9
         tot_sum += nbr
     return tot_sum
+
 if __name__ == "__main__":
     string = ""
     for line in fileinput.input():
