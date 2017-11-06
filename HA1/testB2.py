@@ -11,6 +11,7 @@ class TestB2(unittest.TestCase):
         print("Exec time: {}s with parameters u={}, k={}, c={} and width={} \n"
         .format( round(time.time() - start), u, k, c, width))
 
+    #317.4663905702453 TIME : 11s
     def test_1(self):
         start = time.time()
         width = 22
@@ -20,7 +21,8 @@ class TestB2(unittest.TestCase):
         x_mean = attempts_estimate(u, k, c, width)
         assert_allclose(x_mean, 322, width)
         self.print_all(x_mean, width, u, k ,c, start)
-    #
+
+    #3686.731214829527 TIME: 56s
     def test_2(self):
         start = time.time()
         width = 24
@@ -31,6 +33,7 @@ class TestB2(unittest.TestCase):
         self.print_all(x_mean, width, u, k ,c, start)
         assert_allclose(x_mean, 3685, width)
 
+    #45271.42478813559 TIME: 577s
     def test_3(self):
         start = time.time()
         width = 22
@@ -41,6 +44,7 @@ class TestB2(unittest.TestCase):
         self.print_all(x_mean, width, u, k ,c, start)
         assert_allclose(x_mean, 45270, width)
 
+    # 482506.34375 TIME: 147s
     def test_4(self):
         start = time.time()
         width = 79671
@@ -51,6 +55,7 @@ class TestB2(unittest.TestCase):
         self.print_all(x_mean, width, u, k ,c, start)
         assert_allclose(x_mean, 493981, width)
 
+    #1068148.025 TIME: 395s
     def test_5(self):
         start = time.time()
         width = 15616
@@ -61,6 +66,7 @@ class TestB2(unittest.TestCase):
         self.print_all(x_mean, width, u, k ,c, start)
         assert_allclose(x_mean, 1069997, width)
 
+    #2420620.288888889 TIME: 492s
     def test_6(self):
         start = time.time()
         width = 4783

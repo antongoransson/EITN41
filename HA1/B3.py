@@ -45,12 +45,12 @@ def find_nodes_per_depth(nbr_of_leaves, depth):
         nodes_per_depth.append(nbr_nodes)
     return nodes_per_depth
 
-def build_merkle_path(nodes,i , j, depth, nbr_of_leaves):
+def build_merkle_path(nodes, i , j, depth, nbr_of_leaves):
     path = []
     parentindex =  curr_index = i
     nodes_per_depth = find_nodes_per_depth(nbr_of_leaves, depth)
     first_node_index = 0
-    for k in range(0, depth):
+    for k in range(depth):
         curr_index = int(parentindex + first_node_index)
         if(curr_index % 2 == 0):
             node = "R" + bytes_to_hex(nodes[curr_index + 1])

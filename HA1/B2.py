@@ -30,8 +30,9 @@ def attempts_estimate(u=16, k=2, c=1, width = 22):
     x.append(micro_mint_sim(u, k, c))
     while(True):
         x.append(micro_mint_sim(u, k, c))
-        t  = lambda_interval* np.std(x)/np.sqrt(len(x))
+        t  = lambda_interval* np.std(x) / np.sqrt(len(x))
         if((2 * t) < width):
             break
     m = sum(x)/len(x)
+    print(len(x))
     return m
