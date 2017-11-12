@@ -4,11 +4,6 @@ from random import randrange
 import numpy as np
 
 def micro_mint_sim(u, k, c):
-    '''
-    u is the number of bits used for identifying the bin
-    Parameter k is the number of collisions needed to make a coin
-    c is  number of coins
-    '''
     nbr_coins = attempts = 0
     bins = [0 for x in range(2**u)]
     while (nbr_coins < c):

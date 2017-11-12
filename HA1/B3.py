@@ -2,6 +2,9 @@ from converter import *
 import fileinput
 from math import log2, ceil
 
+'''
+change in paramt to left,right ,list
+'''
 def get_merkle_root(file_in):
     curr_node = bytearray()
     path = hex_to_bytes(file_in.readline()[:-1])
@@ -63,6 +66,7 @@ def build_merkle_path(nodes, i , j, depth, nbr_of_leaves):
 def read_file(file_in=None):
     leaves = []
     if file_in is None:
+        fileinput.readLine()
         for line in fileinput.input():
             if(fileinput.isfirstline()):
                 i = line[:-1]

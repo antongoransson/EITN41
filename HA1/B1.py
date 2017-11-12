@@ -26,6 +26,8 @@ def calc_sum(card_nbr):
     return tot_sum, index
 
 def get_values_from_file(file_in):
+    if file_in is None:
+        raise Exception("A filed needs to be provided")
     string = ""
     for line in file_in:
         string += find_value_x(line[:-1])
@@ -33,7 +35,5 @@ def get_values_from_file(file_in):
 
 
 if __name__ == "__main__":
-    string = ""
-    for line in fileinput.input():
-        string += find_value_x(line[:-1])
+    string = get_values_from_file(fileinput.input())
     print(string)
