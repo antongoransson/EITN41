@@ -23,20 +23,19 @@ def get_merkle_root(file_in):
 def build_merkle_tree(nodes, parents):
     if(len(parents) == 1):
         return
-    else:
-        x = []
-        for i in range(0, len(parents), 2):
-            h1 = bytearray(parents[i])
-            h2 = parents[i+1]
-            for byte in h2:
-                h1.append(byte)
-            parent = sha1_hash_bytes_array(h1)
-            nodes.append(parent)
-            x.append(parent)
-        if(len(x) != 1 and len(x) % 2 != 0):
-            nodes.append(x[-1])
-            x.append(x[-1])
-        build_merkle_tree(nodes, x)
+    x = []
+    for i in range(0, len(parents), 2):
+        h1 = bytearray(parents[i])
+        h2 = parents[i+1]
+        for byte in h2:
+            h1.append(byte)
+        parent = sha1_hash_bytes_array(h1)
+        nodes.append(parent)
+        x.append(parent)
+    if(len(x) != 1 and len(x) % 2 != 0):
+        nodes.append(x[-1])
+        x.append(x[-1])
+    build_merkle_tree(nodes, x)
 
 def find_nodes_per_depth(nbr_of_leaves, depth):
     nodes_per_depth = [nbr_of_leaves]
@@ -63,42 +62,28 @@ def build_merkle_path(nodes, i , j, depth, nbr_of_leaves):
         first_node_index += nodes_per_depth[k]
     return list(reversed(path))
 
-def read_file(file_in=None):
+def read_file(file_in):
     leaves = []
-    if file_in is None:
-        fileinput.readLine()
-        for line in fileinput.input():
-            if(fileinput.isfirstline()):
-                i = line[:-1]
-            elif(fileinput.lineno() == 2):
-                j = line[:-1]
-            else:
-                leaves.append(hex_to_bytes(line[:-1]))
-    else:
-        i = file_in.readline()[:-1]
-        j = file_in.readline()[:-1]
-        for line in file_in:
-            leaves.append(hex_to_bytes(line[:-1]))
+    i = file_in.readline()[:-1]
+    j = file_in.readline()[:-1]
+    for line in file_in:
+        leaves.append(hex_to_bytes(line[:-1]))
     return int(i), int(j), leaves
 
-def full_node(file_in = None):
+def full_node(file_in):
+    if file_in is None:
+        raise Exception("A filed needs to be provided")
     i, j , leaves = read_file(file_in)
     depth = ceil(log2(len(leaves)))
-    nodes = leaves
+    tree = leaves
     nbr_ofleaves = len(leaves)
-    build_merkle_tree(nodes, leaves)
-    path = build_merkle_path(nodes, i, j, depth, nbr_ofleaves)
-    return path[j-1]+ bytes_to_hex(nodes[-1])
+    build_merkle_tree(tree, leaves)
+    path = build_merkle_path(tree, i, j, depth, nbr_ofleaves)
+    return path[j-1]+ bytes_to_hex(tree[-1])
 
 if __name__ == '__main__':
 #     input_var = input("Please choose task (T1 or T2):")
 #     if(str(input_var) == "T1"):
 #         get_merkle_root()
 #     elif(str(input_var)== "T2"):
-    i, j , leaves = read_file()
-    depth = ceil(log2(len(leaves)))
-    nodes = leaves
-    l = len(leaves)
-    build_merkle_tree(nodes, leaves)
-    path = build_merkle_path(nodes, i, j, depth, l)
-    print((path[j-1]+ bytes_to_hex(nodes[-1])))
+    print(full_node(fileinput.input()))

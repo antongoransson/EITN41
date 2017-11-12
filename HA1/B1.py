@@ -11,9 +11,8 @@ def find_value_x(card_nbr):
     return str(round(value))
 
 def calc_sum(card_nbr):
-    tot_sum = 0
-    index = 0
-    for i in range(0, len(card_nbr)):
+    tot_sum = index = 0
+    for i in range(len(card_nbr)):
         if(card_nbr[i] == 'X'):
             index = i
             continue

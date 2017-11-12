@@ -22,7 +22,7 @@ class TestB2(unittest.TestCase):
         assert_allclose(x_mean, 322, width)
         self.print_all(x_mean, width, u, k ,c, start)
 
-    #3686.731214829527 TIME: 56s
+    # 3686.731214829527 TIME: 56s
     def test_2(self):
         start = time.time()
         width = 24
@@ -72,6 +72,17 @@ class TestB2(unittest.TestCase):
         width = 4783
         u = 20
         k = 7
+        c = 10000
+        x_mean = attempts_estimate(u, k, c, width)
+        self.print_all(x_mean, width, u, k ,c, start)
+        assert_allclose(x_mean, 2420113, width)
+        
+    #449169.6482213439
+    def test_7(self):
+        start = time.time()
+        width = 660
+        u = 20
+        k = 3
         c = 10000
         x_mean = attempts_estimate(u, k, c, width)
         self.print_all(x_mean, width, u, k ,c, start)
