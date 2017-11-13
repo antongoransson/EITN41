@@ -67,7 +67,7 @@ def recv_S(S, r, n):
     x = mulinv(x,n)
     print(x)
     # x = (S *x) % n
-    print("X", x)
+    # print("X", x)
 # Step 0:	26 = 1(15) + 11	p0 = 0
 # Step 1:	15 = 1(11) + 4	p1 = 1
 # Step 2:	11 = 2(4) + 3	p2 = 0 - 1( 1) mod 26 = 25

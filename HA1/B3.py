@@ -2,23 +2,26 @@ from converter import *
 import fileinput
 from math import log2, ceil
 
-'''
-change in paramt to left,right ,list
-'''
 def get_merkle_root(file_in):
-    curr_node = bytearray()
-    path = hex_to_bytes(file_in.readline()[:-1])
+    node_list = []
+    left = file_in.readline()[:-1]
+    right = file_in.readline()[1:-1]
     for line in file_in:
-        curr_node = hex_to_bytes(line[1:-1])
-        if(line[0] == 'L'): #Decides which order the append is
-            for byte in path:
-                curr_node.append(byte)
-        else:
-            for byte in curr_node:
-                path.append(byte)
-            curr_node = path
-        path = sha1_hash_bytes_array(curr_node)
-    return bytes_to_hex(sha1_hash_bytes_array(curr_node))
+        node_list.append((line[:-1]))
+    return get_merkle_root_rec(left, right, node_list)
+
+def get_merkle_root_rec(left, right, node_list):
+    left = hex_to_bytes(left)
+    right = hex_to_bytes(right)
+    for byte in right:
+        left.append(byte)
+    if(len(node_list) == 0):
+        return  bytes_to_hex(sha1_hash_bytes_array(left))
+    nextNode = node_list.pop(0)
+    if(nextNode[0] == 'L'): #Decides which order the append is
+        return get_merkle_root_rec(nextNode[1:], bytes_to_hex(sha1_hash_bytes_array(left)), node_list)
+    else:
+        return get_merkle_root_rec(bytes_to_hex(sha1_hash_bytes_array(left)), nextNode[1:], node_list)
 
 def build_merkle_tree(nodes, parents):
     if(len(parents) == 1):

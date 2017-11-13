@@ -7,8 +7,8 @@ def find_value_x(card_nbr):
     if((index + 1) % 2 == 0 ):
         if(value % 2 != 0):
             value += 9
-        value /= 2
-    return str(round(value))
+        value //= 2
+    return str((value))
 
 def calc_sum(card_nbr):
     tot_sum = index = 0
