@@ -82,5 +82,5 @@ if __name__ == '__main__':
     input_var = input("Please choose task (1 or 2):")
     if(str(input_var) == "1"):
         print(get_merkle_root(fileinput.input()))
-    elif(str(input_var)== "2"):
+    elif(str(input_var) == "2"):
         print(full_node(fileinput.input()))

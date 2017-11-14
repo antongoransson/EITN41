@@ -26,7 +26,7 @@ def calc_sum(card_nbr):
 
 def get_values_from_file(file_in):
     if file_in is None:
-        raise Exception("A filed needs to be provided")
+        raise Exception("A file needs to be provided")
     string = "".join([find_value_x(line[:-1]) for line in file_in])
     return string
 
