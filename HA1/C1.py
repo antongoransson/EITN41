@@ -1,103 +1,97 @@
-from random import randrange
+from random import randrange, sample
 from converter import *
-from operator import xor
+import operator
+import functools
 
-def calc_B_i(k, ID, n, e):
-    B = []
-    a = []
-    c = []
-    d = []
-    r = []
-    size = 30
-    for i in range(2*k):
-        a_i = randrange(0, 2**size)
-        c_i = randrange(0, 2**size)
-        d_i = randrange(0, 2**size)
-        r_i = randrange(0, 2**size)
 
-        B_i = calcul_B_i(a_i, c_i, d_i, r_i, ID, e, n)
-        B.append(B_i), a.append(a_i), c.append(c_i), d.append(d_i), r.append(r_i)
+def calc_B_i(k, ID, n, e, inv, size = 2**20):
+    B,quadruples, a, c, d, r  = [[0 for i in range(2*k)] for i in range(6)]
+    B_TEST = []
+    for i in range(2 * k):
+        a_i, c_i, d_i, r_i= [randrange(1, size) for x in range(4)]
+        B_i = calcul_B_i(a_i, c_i, d_i, r_i, ID, e, n, B_TEST)
+        B[i] = B_i
+        quadruples[i] = a_i, c_i, d_i ,r_i
+    return B, B_TEST, quadruples
 
-    return B, a, c, d, r
+def calcul_B_i(a, c, d, r, ID, e, n, B_TEST = None):
+    x_i = sha1_hash(a + c)
+    y_i = sha1_hash(a ^ ID + d)
+    f_x_y = bytes_to_int(x_i) * bytes_to_int(y_i)
 
-def calcul_B_i(a, c, d, r, ID, e, n):
-    a_i_xor  = xor(a, ID)
-    # a_i_bytes = int_to_bytes(a, 4)
-    c_i_bytes = int_to_bytes(c, 4)
+    if B_TEST is not None:
+        B_TEST.append(f_x_y)
+    B_i = r**e * f_x_y % n
 
-    a_i_xor_bytes = int_to_bytes(a_i_xor, 4)
-    # d_i_bytes = int_to_bytes(d, 4)
-    r_i_bytes = int_to_bytes(r, 4)
-
-    # append_arrays(a_i_bytes, c_i_bytes)
-    # append_arrays(a_i_xor_bytes, d_i_bytes)
-    a_i_bytes = a + c
-    a_i_xor_bytes = a_i_xor + d
-    x_i = sha1_hash_bytes_array(a_i_bytes)
-    y_i = sha1_hash_bytes_array(a_i_xor_bytes)
-    append_arrays(x_i, y_i)
-    # res_i = bytes_to_int(x_i) * bytes_to_int(y_i)
-    res_i = bytes_to_int(sha1_hash_bytes_array(x_i))
-    B_i = ((r**e) * res_i) % n
     return B_i
 
-def append_arrays(b1, b2):
-    for b in b2:
-        b1.append(b)
-
-def recv_B(B, a, c, d, r, ID, inv, e, n):
-    for i in range(0, len(B),randrange(1,3)):
-        B_i = calcul_B_i(a[i], c[i], d[i], r[i], ID, e, n)
+def receive_signature(B, ID, inv, e, n, k, R, quadruples):
+    for i in R:
+        a, c, d, r = quadruples[i]
+        B_i = calcul_B_i(a, c, d, r, ID, e, n)
         if(B_i != B[i]):
             raise Exception("Values are not equal")
     S = 1
-    B_i_1 = []
-    for i in range(0, len(B), 2):
-        # print("BEFORE", B[i])
-        S *= (B[i]**inv)
-        # print("AFTER", B[i]**inv)
-    S %= n
-    print("S",S)
-    return S
+    R_I = [i for i in range(len(B)) if i not in R]
+    # functools.reduce(lambda:, [1,2,3,4,5,6], 1)
+    for i in R_I:
+        S *= pow(B[i], inv, n)
+    S = S % n
+    print("Bank",S)
+    return S, R_I
 
-def recv_S(S, r, n):
+def calc_S(S, quadruples_R_I, n, d, R_I):
     x = 1
-    for i in range(len(r)):
-        x*=(r[i]%n)
-    x = mulinv(x,n)
-    print(x)
-    # x = (S *x) % n
-    # print("X", x)
-# Step 0:	26 = 1(15) + 11	p0 = 0
-# Step 1:	15 = 1(11) + 4	p1 = 1
-# Step 2:	11 = 2(4) + 3	p2 = 0 - 1( 1) mod 26 = 25
-# Step 3:	4 = 1(3) + 1	p3 = 1 - 25( 1) mod 26 = -24 mod 26 = 2
-# Step 4:	3 = 3(1) + 0	p4 = 25 - 2( 2) mod 26 = 21
-#  	 	p5 = 2 - 21( 1) mod 26 = -19 mod 26 = 7
-# 15 mod 26
-# def extendex_euc_alg():
+    for i in R_I:
+        _, _, _, r = quadruples_R_I[i]
+        x *= r
+    x = (S * mulinv(x, n)) % n
+    print("Alice", x)
+    return x
 
+def getIndices(B):
+    return sorted(sample(range(len(B)), len(B) // 2))
 
-def xgcd(b, n):
+def extendex_euc_alg(x, n):
     x0, x1, y0, y1 = 1, 0, 0, 1
     while n != 0:
-        q, b, n = b // n, n, b % n
+        q, x, n = x // n, n, x % n
         x0, x1 = x1, x0 - q * x1
         y0, y1 = y1, y0 - q * y1
-    return  b, x0, y0
+    return  x, x0, y0
 
 # x = mulinv(b) mod n, (x * b) % n == 1
 def mulinv(b, n):
-    g, x, _ = xgcd(b, n)
+    g, x, _ = extendex_euc_alg(b, n)
     if g == 1:
         return x % n
 
-e = 5
-n = 17*23
-ID =  123456789
-inv  = mulinv(e, n)
-print("INV", inv)
+def totient(p, q):
+    return (p - 1) * (q - 1)
+
+p = 1033
+q = 1299721
+e = 17
+n = (p) * (q) # 127*89= 11303
+totient_n = totient(p, q)
+ID =  1234415161711
+k = 4
+priv_key  = mulinv(e, totient_n)
+# print("INV", priv_key)
 for i in range(10):
-    B, a, c, d ,r = calc_B_i(4, ID, n, e)
-    S = recv_B(B, a, c, d, r, ID, inv, e, n)
-    recv_S(S, r, n)
+    B, B_TEST, quadruples = calc_B_i(k, ID, n, e , priv_key) # STEP 1
+    R = getIndices(B) # STEP 2
+    quadruples_R = { i: quadruples[i] for i in R}
+    sign, R_I = receive_signature(B, ID, priv_key, e, n, k, R, quadruples_R) #STEP 3.2
+    quadruples_R_I = { i: quadruples[i] for i in R_I}
+    x = 1
+    y = 1
+    for i in R_I:
+        x *= pow(B_TEST[i], priv_key, n)
+    for i in R_I:
+        y *= B_TEST[i]
+    x = x % n
+    S = calc_S(sign, quadruples_R_I, n, priv_key, R_I)
+    print(S == x)
+    print(y % n)
+    print(pow(S, e, n))

@@ -12,7 +12,7 @@ def get_merkle_root_rec(left, right, node_list):
     left, right = hex_to_bytes(left), hex_to_bytes(right)
     for byte in right:
         left.append(byte)
-    path = bytes_to_hex(sha1_hash_bytes_array(left))
+    path = bytes_to_hex(sha1_hash(left))
     if len(node_list) == 0:
         return path
     nextNode = node_list.pop(0)
@@ -29,7 +29,7 @@ def build_merkle_tree(nodes, parents):
         h1, h2 = bytearray(parents[i]), parents[i + 1]
         for byte in h2:
             h1.append(byte)
-        parent = sha1_hash_bytes_array(h1)
+        parent = sha1_hash(h1)
         nodes.append(parent), x.append(parent)
     if len(x) != 1 and len(x) % 2 != 0:
         nodes.append(x[-1]), x.append(x[-1])
@@ -70,7 +70,7 @@ def read_file_B3_2(file_in):
 
 def full_node(file_in):
     if file_in is None:
-        raise Exception("A filed needs to be provided")
+        raise Exception("A file needs to be provided")
     i, j, leaves = read_file_B3_2(file_in)
     nbr_of_leaves = len(leaves)
     depth, tree = ceil(log2(nbr_of_leaves)), leaves

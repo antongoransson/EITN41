@@ -10,7 +10,7 @@ def learning_phase(sender_ip, mix_ip, m, file_in):
         receivers = []
         if ip_sources[i] == sender_ip:
             while ip_sources[i] != mix_ip:
-                 i += 1
+                i += 1
             while i < length and ip_sources[i] == mix_ip:
                 receivers.append(ip_dests[i])
                 i += 1

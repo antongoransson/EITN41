@@ -22,7 +22,7 @@ def bytes_to_hex(byte_array):
 def bytes_to_int(byte_array):
     return int.from_bytes(byte_array, byteorder='big')
 
-def sha1_hash_bytes_array(byte_array, size = None):
+def sha1_hash(byte_array, size = None):
     if(type(byte_array) is int):
         byte_array = int_to_bytes(byte_array, size)
     hash_object = hashlib.sha1(byte_array)
