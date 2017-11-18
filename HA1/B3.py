@@ -32,11 +32,12 @@ def build_merkle_tree(nodes, parents):
         parent = sha1_hash(h1)
         nodes.append(parent), x.append(parent)
     if len(x) != 1 and len(x) % 2 != 0:
+        print(len(x))
         nodes.append(x[-1]), x.append(x[-1])
     return build_merkle_tree(nodes, x)
 
 def find_nodes_per_depth(nbr_of_leaves, depth):
-    nodes_per_depth = [nbr_of_leaves]
+    nodes_per_depth = [nbr_of_leaves if nbr_of_leaves % 2 == 0 else nbr_of_leaves + 1]
     for i in range(1, depth + 1):
         nbr_nodes = nodes_per_depth[i-1] // 2
         if(nbr_nodes != 1 and nbr_nodes % 2 != 0):
@@ -72,11 +73,15 @@ def full_node(file_in):
     if file_in is None:
         raise Exception("A file needs to be provided")
     i, j, leaves = read_file_B3_2(file_in)
+    if len(leaves) % 2 == 1:
+        leaves.append(leaves[-1])
     nbr_of_leaves = len(leaves)
     depth, tree = ceil(log2(nbr_of_leaves)), leaves
+
     tree = build_merkle_tree(tree, leaves)
     path = build_merkle_path(tree, i, j, depth, nbr_of_leaves)
-    return path[j-1]+ bytes_to_hex(tree[-1])
+
+    return path[j-1]+ bytes_to_hex(tree[-1]), path
 
 if __name__ == '__main__':
     input_var = input("Please choose task (1 or 2):")

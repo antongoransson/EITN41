@@ -1,5 +1,6 @@
 from converter import *
 from pcapfile import savefile
+from itertools import takewhile
 
 def learning_phase(sender_ip, mix_ip, m, file_in):
     ip_sources, ip_dests = parse_pcap_file(file_in)
@@ -7,13 +8,14 @@ def learning_phase(sender_ip, mix_ip, m, file_in):
     R, sets = [], []
     i = 0
     while i < length:
-        receivers = []
-        if ip_sources[i] == sender_ip:
-            while ip_sources[i] != mix_ip:
+        # i = ip_sources.index(sender_ip,i ) # GET THIS TO WORK
+        if ip_sources[i] == sender_ip: # target sender has been found
+            receivers = []
+            i = ip_sources.index(mix_ip, i)
+            start = i
+            while i < length and ip_sources[i] == mix_ip: # append batch
                 i += 1
-            while i < length and ip_sources[i] == mix_ip:
-                receivers.append(ip_dests[i])
-                i += 1
+            receivers = ip_dests[start:i]
             i -= 1 # Otherwise first sender after mix would be skipped
             if len(R) < m and is_disjoint(R, receivers): R.append(set(receivers))
             else: sets.append(set(receivers))
@@ -69,4 +71,4 @@ def parse_pcap_file(file_in):
     return ip_sources, ip_dest
 if __name__ == '__main__':
     print(find_partners('159.237.13.37', '94.147.150.188', 2, 'inputs/B2_cia.log.1337.pcap'))
-    print(find_partners("161.53.13.37", "11.192.206.171", 12, 'inputs/B2_cia.log.1339.pcap'))
+    # print(find_partners("161.53.13.37", "11.192.206.171", 12, 'inputs/B2_cia.log.1339.pcap'))
