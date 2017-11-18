@@ -1,6 +1,5 @@
 from converter import *
 from pcapfile import savefile
-from itertools import takewhile
 
 def learning_phase(sender_ip, mix_ip, m, file_in):
     ip_sources, ip_dests = parse_pcap_file(file_in)
@@ -44,12 +43,10 @@ def is_disjoint(list_of_sets, set2):
 def parse_pcap_file(file_in):
     testcap = open(file_in, 'rb')
     capfile = savefile.load_savefile(testcap, layers=2)
-    # print ('timestamp\t\teth src\t\t\teth dst\t\t\tIP src\t\tIP dst')
     ip_sources, ip_dests = [], []
     for pkt in capfile.packets:
         ip_sources.append(pkt.packet.payload.src.decode('UTF8'))
         ip_dests.append(pkt.packet.payload.dst.decode('UTF8'))
-        # print ('{}\t\t{}\t{}\t{}\t{}'.format(timestamp, eth_src, eth_dst, ip_src, ip_dst))
     testcap.close()
     return ip_sources, ip_dests
 
