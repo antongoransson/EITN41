@@ -20,8 +20,7 @@ def excluding_phase(R, sets):
     for item_set in sets:
         disjoint_sets = [i for i in range(len(R)) if not(R[i].isdisjoint(item_set))]
         if len(disjoint_sets) == 1:
-            i = disjoint_sets[0]
-            R[i] &= item_set
+            R[disjoint_sets[0]] &= item_set
     return R
 
 def find_partners(sender_ip, mix_ip, m, file_in):
@@ -40,25 +39,22 @@ def ip_to_int(ip):
     return hex_to_int(string)
 
 def is_disjoint(list_of_sets, set2):
-    for item_set in list_of_sets:
-        if not(item_set.isdisjoint(set2)):
-            return False
-    return True
+    joint_sets = [0 for item_set in list_of_sets if not(item_set.isdisjoint(set2))]
+    return len(joint_sets) == 0
+
 
 def parse_pcap_file(file_in):
     testcap = open(file_in, 'rb')
     capfile = savefile.load_savefile(testcap, layers=2)
     # print ('timestamp\t\teth src\t\t\teth dst\t\t\tIP src\t\tIP dst')
-    ip_sources = []
-    ip_dest = []
+    ip_sources, ip_dests = [], []
     for pkt in capfile.packets:
-        ip_src = pkt.packet.payload.src.decode('UTF8')
-        ip_sources.append(ip_src)
-        ip_dst = pkt.packet.payload.dst.decode('UTF8')
-        ip_dest.append(ip_dst)
+        ip_sources.append(pkt.packet.payload.src.decode('UTF8'))
+        ip_dests.append(pkt.packet.payload.dst.decode('UTF8'))
         # print ('{}\t\t{}\t{}\t{}\t{}'.format(timestamp, eth_src, eth_dst, ip_src, ip_dst))
     testcap.close()
-    return ip_sources, ip_dest
+    return ip_sources, ip_dests
+
 if __name__ == '__main__':
     print(find_partners('159.237.13.37', '94.147.150.188', 2, 'inputs/B2_cia.log.1337.pcap'))
     # print(find_partners("161.53.13.37", "11.192.206.171", 12, 'inputs/B2_cia.log.1339.pcap'))
