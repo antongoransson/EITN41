@@ -5,15 +5,14 @@ from itertools import takewhile
 def learning_phase(sender_ip, mix_ip, m, file_in):
     ip_sources, ip_dests = parse_pcap_file(file_in)
     R, sets, i = [], [], 0
-    while True:
-        try: i = ip_sources.index(sender_ip, i)
-        except: break
+    while i is not None:
+        i = ip_sources.index(sender_ip, i)
         start = i = ip_sources.index(mix_ip, i)
         try: i = ip_dests.index(mix_ip, i)
-        except: break
+        except: i = None
         receivers = ip_dests[start:i]
-        if len(R) < m and is_disjoint(R, receivers): R.append(set(receivers))
-        else: sets.append(set(receivers))
+        t_set = R if len(R) < m and is_disjoint(R, receivers) else sets
+        t_set.append(set(receivers))
     return R, sets
 
 def excluding_phase(R, sets):
@@ -42,7 +41,6 @@ def is_disjoint(list_of_sets, set2):
     joint_sets = [0 for item_set in list_of_sets if not(item_set.isdisjoint(set2))]
     return len(joint_sets) == 0
 
-
 def parse_pcap_file(file_in):
     testcap = open(file_in, 'rb')
     capfile = savefile.load_savefile(testcap, layers=2)
@@ -58,3 +56,4 @@ def parse_pcap_file(file_in):
 if __name__ == '__main__':
     print(find_partners('159.237.13.37', '94.147.150.188', 2, 'inputs/B2_cia.log.1337.pcap'))
     # print(find_partners("161.53.13.37", "11.192.206.171", 12, 'inputs/B2_cia.log.1339.pcap'))
+    # print(find_partners('245.221.13.37','15.24.22.93',9, 'inputs/cia.log.2.pcap'))
