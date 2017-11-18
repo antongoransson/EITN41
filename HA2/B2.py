@@ -4,34 +4,24 @@ from itertools import takewhile
 
 def learning_phase(sender_ip, mix_ip, m, file_in):
     ip_sources, ip_dests = parse_pcap_file(file_in)
-    length = len(ip_sources)
-    R, sets = [], []
-    i = 0
-    while i < length:
-        # i = ip_sources.index(sender_ip,i ) # GET THIS TO WORK
-        if ip_sources[i] == sender_ip: # target sender has been found
-            receivers = []
-            i = ip_sources.index(mix_ip, i)
-            start = i
-            while i < length and ip_sources[i] == mix_ip: # append batch
-                i += 1
-            receivers = ip_dests[start:i]
-            i -= 1 # Otherwise first sender after mix would be skipped
-            if len(R) < m and is_disjoint(R, receivers): R.append(set(receivers))
-            else: sets.append(set(receivers))
-        i += 1
+    R, sets, i = [], [], 0
+    while True:
+        try: i = ip_sources.index(sender_ip, i)
+        except: break
+        start = i = ip_sources.index(mix_ip, i)
+        try: i = ip_dests.index(mix_ip, i)
+        except: break
+        receivers = ip_dests[start:i]
+        if len(R) < m and is_disjoint(R, receivers): R.append(set(receivers))
+        else: sets.append(set(receivers))
     return R, sets
 
 def excluding_phase(R, sets):
-    disjoint_sets = 0
     for item_set in sets:
-        for i in range(len(R)):
-            if not(R[i].isdisjoint(item_set)):
-                disjoint_sets += 1
-                index = i
-        if disjoint_sets == 1:
-            R[index] = R[index] & item_set
-        disjoint_sets = 0
+        disjoint_sets = [i for i in range(len(R)) if not(R[i].isdisjoint(item_set))]
+        if len(disjoint_sets) == 1:
+            i = disjoint_sets[0]
+            R[i] &= item_set
     return R
 
 def find_partners(sender_ip, mix_ip, m, file_in):
