@@ -2,7 +2,7 @@ from functools import reduce
 from sys import argv
 
 def L_func(n):
-    return lambda x: (x - 1) / n
+    return lambda x: (x - 1) // n
 
 def totient(p, q):
     return (p - 1) * (q - 1)
@@ -24,29 +24,28 @@ def mulinv(b, n):
     g, x, _ = extendex_euc_alg(b, n)
     if g == 1:
         return x % n
+def count_votes(p, q, g, votes):
+    prod_sum = mul_sum(votes)
+    n = p * q
+    L = L_func(n)
+    l = totient(p, q)
+    mu = mulinv(L(pow(g, l, n**2)), n)
+    prod = pow(prod_sum, l, n**2)
+    vote_sum = L(prod) * mu % n
+    if vote_sum > len(votes):
+        vote_sum -= n
+    return vote_sum
 
 if __name__ == '__main__':
     if len(argv) > 1 and argv[1] == "f":
         print("Read from file")
         votes = []
         while True:
-            try:
-                votes.append(input(''))
-            except EOFError:
-                break
-        votes = [int(line) for line in votes]
+            try: votes.append(int(input('')))
+            except: break
         p, q, g = 1117, 1471, 652534095028
     else:
         votes = [929, 296, 428]
         p, q, g = 5, 7, 867
-    prod_sum = mul_sum(votes)
-    n = p * q
-    L = L_func(n)
-    l = totient(p,q)
-    my = mulinv(L(pow(g, l, n**2)), n)
-    prod = pow(prod_sum,l, n**2)
-    vote_sum = L(prod) * my % n
-    if vote_sum > len(votes):
-        print(vote_sum - n)
-    else:
-        print(vote_sum)
+    vote_sum = count_votes(p, q, g, votes)
+    print("Sum of votes:", vote_sum)
