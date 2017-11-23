@@ -1,7 +1,6 @@
 from functools import reduce
 from sys import argv
 
-# Least common multiple is not in standard libraries? It's in gmpy, but this is simple enough:
 def L_func(n):
     return lambda x: (x - 1) / n
 
