@@ -10,9 +10,7 @@ def get_merkle_root(file_in):
 
 def get_merkle_root_rec(left, right, node_list):
     left, right = hex_to_bytes(left), hex_to_bytes(right)
-    for byte in right:
-        left.append(byte)
-    path = bytes_to_hex(sha1_hash(left))
+    path = bytes_to_hex(sha1_hash(left + right))
     if len(node_list) == 0:
         return path
     nextNode = node_list.pop(0)
@@ -27,12 +25,9 @@ def build_merkle_tree(nodes, parents):
     x = []
     for i in range(0, len(parents), 2):
         h1, h2 = bytearray(parents[i]), parents[i + 1]
-        for byte in h2:
-            h1.append(byte)
-        parent = sha1_hash(h1)
+        parent = sha1_hash(h1 + h2)
         nodes.append(parent), x.append(parent)
     if len(x) != 1 and len(x) % 2 != 0:
-        print(len(x))
         nodes.append(x[-1]), x.append(x[-1])
     return build_merkle_tree(nodes, x)
 
@@ -81,7 +76,7 @@ def full_node(file_in):
     tree = build_merkle_tree(tree, leaves)
     path = build_merkle_path(tree, i, j, depth, nbr_of_leaves)
 
-    return path[j-1]+ bytes_to_hex(tree[-1]), path
+    return path[j-1]+ bytes_to_hex(tree[-1])
 
 if __name__ == '__main__':
     input_var = input("Please choose task (1 or 2):")
