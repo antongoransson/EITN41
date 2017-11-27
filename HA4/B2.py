@@ -1,10 +1,11 @@
 import requests
 from sys import argv
+import timeit
 requests.packages.urllib3.disable_warnings()
 
 def get_req(url, payload):
      return requests.get(url, params=payload, verify=False)
- 
+
 # https://eitn41.eit.lth.se:3119/ha4/addgrade.php?name=Kalle&grade=5&signature=6823
 def brute_force(name, grade, string="0123456789abcdef", length=20):
     sign = "" #6823ea50b133c58cba36
@@ -15,12 +16,13 @@ def brute_force(name, grade, string="0123456789abcdef", length=20):
         sign = ""
         while len(sign) < length:
             req_times = {}
-                for char in string:
-                    try_sign = sign + char
-                    payload["signature"] = try_sign
-                    req = get_req(url, payload)
-                    req_times[try_sign] = req.elapsed.total_seconds()
-            sign = max(a, key = a.get)
+            for char in string:
+                try_sign = sign + char
+                payload["signature"] = try_sign
+                req = get_req(url, payload)
+                req_times[try_sign] = req.elapsed.total_seconds()
+            sign = max(req_times, key = req_times.get)
+            print(sign)
         payload["signature"] = sign
         req = get_req(url, payload)
         ver = req.text.strip() == "1"
