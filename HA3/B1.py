@@ -1,58 +1,53 @@
 from converter import *
-import os
 from random import randrange
-import numpy as np
-import scipy as sp
-import scipy.stats
-import random
+import matplotlib.pyplot as plt
 
-def mean_confidence_interval(data, confidence=0.95):
-    a = 1.0*np.array(data)
-    n = len(a)
-    m, se = np.mean(a), scipy.stats.sem(a)
-    h = se * sp.stats.t.ppf(( 1+ confidence) / 2., n-1)
-    return  m-h, m, m+h
+def new_commit(X):
+    v = randrange(0, 2)
+    rand = randrange(0, 2**16)
+    return v, commitment_scheme(v, rand, X)
 
 #Binding – Sender can not change her mind after committing to the value==
 # Sender finding new hash for v != v:_start
 #Concealing – Receiver can not determine value of v before revealing
 # Reciver finding the value commited by sender
 def commitment_scheme(v, k, X):
-    v, k = int_to_bytes(v, size=1), int_to_bytes(k, size=2)
-    return bytes_to_int(sha1_hash(v+k)) % 2**X
+    v_k = int_to_bytes(v, size=1) + int_to_bytes(k, size=2)
+    return bytes_to_int(sha1_hash(v_k)) % 2**X
 
-def binding_probability(s_commit, v, X):
-    v_new = 1 if v == 0 else 0
-    found = False
+def binding_probability(X):
+    v, s_commit = new_commit(X)
+    v_new = 1 ^ v
     for i in range(2**16):
         commit = commitment_scheme(v_new, i, X)
         if commit == s_commit:
-            found = True
-            break
-    return 1 if found else 0
+            return 1
+    return 0
 
-def concealing_probability(s_commit, X):
+def conceal_probability(X):
+    v0, v1 = 0, 1
+    v, s_commit = new_commit(X)
     commits = {0: [], 1: []}
-    for v in [0, 1]:
-        for i in range(2**16):
-            commit = commitment_scheme(v, i, X)
-            if commit == s_commit:
-                commits[v].append(commit)
-    possibilites = len(commits[0]) + len(commits[1])
-    # print("Nbr of probable values: {}".format(possibilites))
-    # print("Probability of find correct one: {}%".format(100*(1 / possibilites)))
-    return 1 / possibilites
+    for i in range(2**16):
+        c0 = commitment_scheme(v0, i, X)
+        c1 = commitment_scheme(v1, i, X)
+        if c0 == s_commit: commits[v0].append(c0)
+        if c1 == s_commit: commits[v1].append(c1)
+    return len(commits[v]) / (len(commits[v0]) + len(commits[v1]))
 
-conceal_prob, binding_prob = [], []
-for X in range(1000):
-    v = randrange(0, 2)
-    X = 25 # X > 25 100%
-    rand = randrange(0, 2**16)
-    s_commit = commitment_scheme(v, rand, X)
-    binding_prob.append(binding_probability(s_commit, v, X))
-    conceal_prob.append(concealing_probability(s_commit, X))
-print("Conf Interval", mean_confidence_interval(binding_prob))
-print("Breaking binding property prob", 100*(sum(binding_prob) / len(binding_prob)),"%")
-
-print("Conf Interval", mean_confidence_interval(conceal_prob))
-print("Breaking concealing property prob", 100*(sum(conceal_prob) / len(conceal_prob)),"%")
+if __name__ == '__main__':
+    conceal_prob_tot, binding_prob_tot = [], []
+    end, step, res = 40, 2, 40
+    for X in range(0, end, step):
+        binding_prob = [binding_probability(X) for k in range(res)]
+        conceal_prob = [conceal_probability(X) for k in range(res)]
+        binding_prob_tot.append(100*(sum(binding_prob) / len(binding_prob)))
+        conceal_prob_tot.append(100*(sum(conceal_prob) / len(conceal_prob)))
+        print(round(100 * X / end),"%")
+    x = [X for X in range(0, end, step)]
+    plt.plot(x, binding_prob_tot, label="Binding prob")
+    plt.plot(x, conceal_prob_tot, label="Conceal prob")
+    plt.ylabel('Prob of breaking scheme in %')
+    plt.xlabel('Nbr of bits used of hash')
+    plt.legend(loc='best')
+    plt.show()

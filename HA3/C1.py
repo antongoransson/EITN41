@@ -24,6 +24,7 @@ def mulinv(b, n):
     g, x, _ = extendex_euc_alg(b, n)
     if g == 1:
         return x % n
+    
 def count_votes(p, q, g, votes):
     prod_sum = mul_sum(votes)
     n = p * q
