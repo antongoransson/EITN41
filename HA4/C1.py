@@ -85,13 +85,14 @@ def otr_smp(passphrase, p, g, g1, msg):
     P_b_inv = mulinv(P_b, p)
     print("ACK", R_ab == P_a*P_b_inv % p)
 
-    msg = bytearray(byte(0, size = 1) * (len(DH_key) - len(h_bytes(msg))) + h_bytes(msg))
+    msg = byte(0, size = 1) * (len(DH_key) - len(h_bytes(msg))) + h_bytes(msg)
 
     enc_msg = bytes(a ^ b for a, b in zip(msg, DH_key))
     enc_msg_str = h_str(b_int(enc_msg))
 
     soc.send(encode(enc_msg_str))
     return recv()
+
 if __name__ == '__main__':
     if len(argv) == 2:
         msg = argv[1]

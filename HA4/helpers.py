@@ -1,4 +1,5 @@
 from binascii import unhexlify, hexlify
+
 def h_bytes(h):
     return bytearray(unhexlify(h)) # converts string to byte_array
 
