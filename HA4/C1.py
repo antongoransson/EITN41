@@ -29,7 +29,7 @@ def otr_smp(passphrase, p, g, g1, msg):
     ########## SMP ###########
     ##########################
     g2_a = h_int(recv())
-    print ('\nreceived g_2a:')
+    print ('\nreceived g_2a')
 
     b2 = randrange(2, p)
     g1_b2 = pow(g1, b2, p)
@@ -38,7 +38,7 @@ def otr_smp(passphrase, p, g, g1, msg):
     print ('\nsent g1_b2:', recv())
 
     g3_a = h_int(recv())
-    print ('\nreceived g3_a:')
+    print ('\nreceived g3_a')
 
     b3 = randrange(2, p)
     g1_b3 = pow(g1, b3, p)
@@ -48,7 +48,7 @@ def otr_smp(passphrase, p, g, g1, msg):
     print ('\nsent g1_b3:', recv())
 
     P_a = h_int(recv())
-    print ('\nreceived P_a:')
+    print ('\nreceived P_a')
 
     b = randrange(2, p)
     g3 = pow(g3_a, b3, p)
@@ -59,18 +59,18 @@ def otr_smp(passphrase, p, g, g1, msg):
     print ('\nsent P_B:', recv())
 
     Q_a = h_int(recv())
-    print ('\nreceived Q_a:')
+    print ('\nreceived Q_a')
     g2 = pow(g2_a, b2, p)
 
     y = b_int(sha1(DH_key + passphrase).digest())
 
-    Q_b = (pow(g1, b, p)*(pow(g2, y, p))) % p
+    Q_b = pow(g1, b, p) * pow(g2, y, p)
     Q_b_str = h_str(Q_b)
     soc.send(encode(Q_b_str))
     print ('\nsent Q_b:', recv())
 
     R_a = h_int(recv())
-    print ('\nreceived R_a:')
+    print ('\nreceived R_a')
 
     Q_b_inv = mulinv(Q_b, p)
 
@@ -83,7 +83,7 @@ def otr_smp(passphrase, p, g, g1, msg):
 
     R_ab = pow(R_a, b3, p)
     P_b_inv = mulinv(P_b, p)
-    print("ACK", R_ab == P_a*P_b_inv % p)
+    print("ACK", R_ab == P_a * P_b_inv % p)
 
     msg = byte(0, size = 1) * (len(DH_key) - len(h_bytes(msg))) + h_bytes(msg)
 
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     if len(argv) == 2:
         msg = argv[1]
     else:
-        msg = "0123456789abcdef"
+        msg = "66a17e82a5bd6de67aeace5e64c3fe3a831a50d6"
     passphrase = encode("eitn41 <3")
     g = g1 = 2
     p = "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA237327FFFFFFFFFFFFFFFF"
