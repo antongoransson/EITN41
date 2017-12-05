@@ -1,14 +1,12 @@
 from hashlib import sha1
-from binascii import unhexlify,hexlify
+from math import ceil
+from binascii import unhexlify, hexlify
 from sys import argv
 
-def i_to_b(i, size=1):
-    return i.to_bytes(size,byteorder='big')
-
-def h_to_b(h):
+def to_byte(h):
     return unhexlify(h)
 
-def b_to_h(b):
+def to_hex(b):
     return hexlify(b).decode('utf-8')
 
 def I2OSP(x, xLen):
@@ -18,37 +16,36 @@ def I2OSP(x, xLen):
         x //= 256
     return bytes(X[::-1])
 
-def OAEP_encode(M, seed, k = 128, hLen = 20):
-    lHash = sha1().digest()
+def OAEP_encode(M, seed, k = 128, hLen = 20, L="", Hash=sha1):
+    lHash = Hash(L.encode('utf8')).digest()
     PS = I2OSP(0, k - len(M) // 2 - 2 * hLen - 2)
-    DB = lHash  + PS + I2OSP(1, 1) +  h_to_b(M)
+    DB = lHash  + PS + I2OSP(1, 1) +  to_byte(M)
     dbMask = MGF1(seed, k- hLen - 1)
-    maskedDB = bytes(a ^ b for a, b in zip(h_to_b(dbMask), DB))
-    seedMask = MGF1(b_to_h(maskedDB), hLen)
-    maskedSeed = bytes(a ^ b for a, b in zip(h_to_b(seed), h_to_b(seedMask)))
+    maskedDB = bytes(a ^ b for a, b in zip(to_byte(dbMask), DB))
+    seedMask = MGF1(to_hex(maskedDB), hLen)
+    maskedSeed = bytes(a ^ b for a, b in zip(to_byte(seed), to_byte(seedMask)))
     EM = I2OSP(0, 1) +  maskedSeed + maskedDB
-    return b_to_h(EM)
+    return to_hex(EM)
 
 def OAEP_decode(EM, k = 128, hLen = 20):
-    EM = h_to_b(EM)
+    EM = to_byte(EM)
     maskedSeed = EM[1:hLen + 1]
     maskedDB = EM[hLen + 1:]
-    seedMask = MGF1(b_to_h(maskedDB), hLen)
-    seed = bytes(a ^ b for a, b in zip(maskedSeed, h_to_b(seedMask)))
-    dbMask = MGF1(b_to_h(seed), k - hLen - 1)
-    DB = bytes(a ^ b for a, b in zip(h_to_b(dbMask), maskedDB))[hLen:]
-    M = DB[DB.index(1) + 1:]
-    return b_to_h(M)
+    seedMask = MGF1(to_hex(maskedDB), hLen)
+    seed = bytes(a ^ b for a, b in zip(maskedSeed, to_byte(seedMask)))
+    dbMask = MGF1(to_hex(seed), k - hLen - 1)
+    DB = bytes(a ^ b for a, b in zip(to_byte(dbMask), maskedDB))[hLen:]
+    index = DB.index(1) + 1
+    M = DB[index:]
+    return to_hex(M)
 
-def MGF1(mgfSeed, maskLen, Hash=sha1):
-    mgfSeed = h_to_b(mgfSeed)
+def MGF1(mgfSeed, maskLen, hLen = 20, Hash=sha1):
+    mgfSeed = to_byte(mgfSeed)
     T = b''
-    i = 0
-    while len(T) < maskLen:
+    for i in range(ceil(maskLen / hLen)):
          C = I2OSP(i, 4)
-         i += 1
          T += Hash(mgfSeed + C).digest()
-    return b_to_h(T[:maskLen])
+    return to_hex(T[:maskLen])
 
 if __name__ == '__main__':
     if len(argv) == 2:
