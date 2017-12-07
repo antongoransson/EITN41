@@ -26,19 +26,19 @@ def jacobi (a, m):
 def extendex_euc_alg(x, n):
   x0, x1, y0, y1 = 1, 0, 0, 1
   while n != 0:
-      q, x, n = x // n, n, x % n
-      x0, x1 = x1, x0 - q * x1
-      y0, y1 = y1, y0 - q * y1
-  return  x, x0, y0
+    q, x, n = x // n, n, x % n
+    x0, x1 = x1, x0 - q * x1
+    y0, y1 = y1, y0 - q * y1
+  return  x, x0
 
 # x = mulinv(b) mod n, (x * b) % n == 1
 def mulinv(b, n):
-  g, x, _ = extendex_euc_alg(b, n)
+  g, x = extendex_euc_alg(b, n)
   if g == 1:
-      return x % n
+    return x % n
 
-def PKG(a, M, p, q):
-  return pow(a, (M + 5 - p - q) // 8, m)
+def PKG(a, m, p, q):
+  return pow(a, (m + 5 - p - q) // 8, m)
 
 def find_a(identity, m):
   h = sha1(identity.encode('utf8'))
@@ -52,15 +52,12 @@ def find_t(m):
     t = randrange(0, m)
   return t
 
-def find_bit(bits, r, m):
-  b = [jacobi(h_int(s) + 2 * r, m) for s in bits]
-  b = [x + 1 if x < 0 else x for x in b]
+def find_bit(encrypted_bits, r, m):
+  b = [jacobi(h_int(s) + 2 * r, m) for s in encrypted_bits]
+  b = [0 if x < 0 else x for x in b]
   return int(''.join(map(str, b)), 2)
 
-if __name__ == '__main__':
-  identity = 'walterwhite@crypto.sec'
-  p = h_int('9240633d434a8b71a013b5b00513323f')
-  q = h_int('f870cfcd47e6d5a0598fc1eb7e999d1b')
+def IBE(identity, p , q):
   m = p  * q
   encrypted_bits = []
   while True:
@@ -73,3 +70,10 @@ if __name__ == '__main__':
   code = find_bit(encrypted_bits, r, m)
   print('r:', hex(r)[2:])
   print('CODE:', code)
+
+
+if __name__ == '__main__':
+  identity = 'walterwhite@crypto.sec'
+  p = h_int('9240633d434a8b71a013b5b00513323f')
+  q = h_int('f870cfcd47e6d5a0598fc1eb7e999d1b')
+  IBE(identity, p, q)

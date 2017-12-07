@@ -7,11 +7,11 @@ def extendex_euc_alg(x, n):
         q, x, n = x // n, n, x % n
         x0, x1 = x1, x0 - q * x1
         y0, y1 = y1, y0 - q * y1
-    return  x, x0, y0
+    return  x, x0
 
 # x = mulinv(b) mod n, (x * b) % n == 1
 def mulinv(b, n):
-    g, x, _ = extendex_euc_alg(b, n)
+    g, x = extendex_euc_alg(b, n)
     if g == 1:
         return x % n
 
