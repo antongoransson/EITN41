@@ -4,19 +4,13 @@ from sys import argv
 from binascii import unhexlify
 import socket
 
-
-
-def I2OSP(x, xLen):
+def I2OSP(x, xLen = None):
+    if xLen is None: xLen = (x.bit_length() + 7) // 8
     X = []
     for i in range(xLen):
         X.append(x % 256)
         x //= 256
     return bytes(X[::-1])
-
-def byte(x, size=None):
-    if size is None:
-        size = (x.bit_length() + 7) // 8
-    return x.to_bytes(size, 'big')
 
 def extendex_euc_alg(x, n):
     x0, x1, y0, y1 = 1, 0, 0, 1
@@ -35,11 +29,11 @@ def mulinv(b, n):
 def recv():
     return soc.recv(4096).decode('utf8').strip()
 
-def send(x):
-    soc.send(format(x, 'x').encode('utf8'))
-
 def recv_int():
     return int(soc.recv(4096).decode('utf8').strip(), 16)
+
+def send(x):
+    soc.send(format(x, 'x').encode('utf8'))
 
 def otr_smp(passphrase, p, g, g1, msg):
     p = int(p, 16)
@@ -54,7 +48,7 @@ def otr_smp(passphrase, p, g, g1, msg):
     send(g_x2)
     print ('\nsent g_x2:', recv())
 
-    DH_key = byte(pow(g_x1, x2, p))
+    DH_key = I2OSP(pow(g_x1, x2, p))
 
     ##########################
     ########## SMP ###########
@@ -67,7 +61,7 @@ def otr_smp(passphrase, p, g, g1, msg):
     send(g1_b2)
     print ('\nsent g1_b2:', recv())
 
-    g3_a = (recv_int())
+    g3_a = recv_int()
     print ('\nreceived g3_a')
 
     b3 = randrange(2, p)

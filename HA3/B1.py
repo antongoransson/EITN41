@@ -37,14 +37,14 @@ def conceal_probability(X):
 
 if __name__ == '__main__':
     conceal_prob_tot, binding_prob_tot = [], []
-    end, step, res = 40, 2, 40
-    for X in range(0, end, step):
+    start, end, step, res = 0, 30, 1, 5
+    for X in range(start, end, step):
         binding_prob = [binding_probability(X) for k in range(res)]
         conceal_prob = [conceal_probability(X) for k in range(res)]
         binding_prob_tot.append(100*(sum(binding_prob) / len(binding_prob)))
         conceal_prob_tot.append(100*(sum(conceal_prob) / len(conceal_prob)))
-        print(round(100 * X / end),"%")
-    x = [X for X in range(0, end, step)]
+        print(round(100 * X / (end - start )),"%")
+    x = [X for X in range(start, end, step)]
     plt.plot(x, binding_prob_tot, label="Binding prob")
     plt.plot(x, conceal_prob_tot, label="Conceal prob")
     plt.ylabel('Prob of breaking scheme in %')
