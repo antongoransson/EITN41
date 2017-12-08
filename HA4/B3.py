@@ -16,8 +16,8 @@ def I2OSP(x, xLen):
         x //= 256
     return bytes(X[::-1])
 
-def OAEP_encode(M, seed, k = 128, hLen = 20, L="", Hash=sha1):
-    lHash = Hash(L.encode('utf8')).digest()
+def OAEP_encode(M, seed, k = 128, hLen = 20, L=b'', Hash=sha1):
+    lHash = Hash(L).digest()
     PS = I2OSP(0, k - len(M) // 2 - 2 * hLen - 2)
     DB = lHash  + PS + I2OSP(1, 1) +  to_byte(M)
     dbMask = MGF1(seed, k- hLen - 1)
