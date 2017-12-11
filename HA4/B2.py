@@ -13,7 +13,7 @@ def key_max_val(d):
     return max(d, key = d.get)
 # Kalle 5 6823ea50b133c58cba36
 # https://eitn41.eit.lth.se:3119/ha4/addgrade.php?name=Kalle&grade=5&signature=6823
-def timing_attack(name, grade, h_str="0123456789abcdef", length=20, tries=20):
+def timing_attack(name, grade, h_str="0123456789abcdef", length=20, tries=12):
     url = "https://eitn41.eit.lth.se:3119/ha4/addgrade.php"
     sign = ""
     t = time.time()
