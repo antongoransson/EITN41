@@ -35,8 +35,8 @@ def OAEP_decode(EM, k = 128, hLen = 20):
     seed = bytes(a ^ b for a, b in zip(maskedSeed, to_byte(seedMask)))
     dbMask = MGF1(to_hex(seed), k - hLen - 1)
     DB = bytes(a ^ b for a, b in zip(to_byte(dbMask), maskedDB))[hLen:]
-    index = DB.index(1) + 1
-    M = DB[index:]
+    flag_i = DB.index(1) + 1
+    M = DB[flag_i:]
     return to_hex(M)
 
 def MGF1(mgfSeed, maskLen, hLen = 20, Hash=sha1):
