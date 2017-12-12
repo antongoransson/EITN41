@@ -5,7 +5,7 @@ from sys import argv
 def b_int(b):
     return int.from_bytes(b, byteorder='big')
 
-def jacobi (a, m):
+def jacobi(a, m):
     j = 1
     a %= m
     while a:
@@ -26,7 +26,7 @@ def extendex_euc_alg(x, n):
         q, x, n = x // n, n, x % n
         x0, x1 = x1, x0 - q * x1
         y0, y1 = y1, y0 - q * y1
-    return  x, x0, y0
+    return x, x0, y0
 
 # x = mulinv(b) mod n, (x * b) % n == 1
 def mulinv(b, n):
@@ -54,8 +54,8 @@ def decrypt_bits(encrypted_bits, r, m):
     b = [0 if x < 0 else x for x in b]
     return int(''.join(map(str, b)), 2)
 
-def IBE(identity, p , q, encrypted_bits):
-    m = p  * q
+def IBE(identity, p, q, encrypted_bits):
+    m = p * q
     a = quadratic_residue(identity, m)
     r = PKG(a, m, p, q)
     t = get_t(m)
