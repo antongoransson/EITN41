@@ -18,29 +18,22 @@ def mulinv(b, n):
 def hex2(x):
     return '{}{:x}'.format('0' * (len(hex(x)) % 2), x)
 
-def bytes_needed(i):
-    if i == 0:
-        return 1
-    return (i.bit_length() + 7) // 8
-
 def DER_encode_len(l):
     l_hex = hex2(l)
     if l >= 0x80:
-        l_hex = '8{}{}'.format(len(l_hex) // 2, l_hex)
+        l_hex = '8' + str(len(l_hex) // 2) +  l_hex
     return l_hex
 
 def DER_encode_int(i):
-    l = bytes_needed(i)
     i_hex = hex2(i)
     if int(i_hex[0], 16) >= 0b1000:
-        i_hex = '00{}'.format(i_hex)
-        l += 1
-    l_hex = DER_encode_len(l)
-    return '02{}{}'.format(l_hex, i_hex)
+        i_hex = '00' +  i_hex
+    l_hex = DER_encode_len(len(i_hex) // 2)
+    return '02' + l_hex + i_hex
 
-def DER_encode_cert(seq):
+def DER_encode_seq(seq):
     l_hex = DER_encode_len(len(seq) // 2)
-    return unhexlify('30{}{}'.format(l_hex, seq)) # 30 = certificate
+    return unhexlify('30' + l_hex + seq) # 30 = sequence
 
 def calc_priv_key(p, q, e, version = 0):
     n = p * q
@@ -50,10 +43,10 @@ def calc_priv_key(p, q, e, version = 0):
     coeff = mulinv(q, p)
 
     priv_key = map(DER_encode_int, [version, n, e, d, p, q, exp1, exp2, coeff])
-    cert = DER_encode_cert(''.join(priv_key))
+    cert = DER_encode_seq(''.join(priv_key))
     enc_cert = b64encode(cert).decode('utf8')
     key_out = ''.join(['\n' * (i % 64 == 0 and i != 0) + s for i, s in enumerate(enc_cert)])
-    return enc_cert, key_out # 64 charcters per line
+    return enc_cert, key_out # 64 characters per line
 
 if __name__ == '__main__':
     p = input('p: ')
