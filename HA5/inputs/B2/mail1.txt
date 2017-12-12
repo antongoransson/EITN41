@@ -1,0 +1,12 @@
+To: bob@eitn41.eit.lth.se
+From: alice@eitn41.eit.lth.se
+Subject: 14570
+MIME-Version: 1.0
+Content-Disposition: attachment; filename="smime.p7m"
+Content-Type: application/pkcs7-mime; name="smime.p7m"
+Content-Transfer-Encoding: base64
+
+MHYGCSqGSIb3DQEHBaBpMGcCAQAwBwYFKw4DAhowQwYJKoZIhvcNAQcBoDYENENv
+bnRlbnQtVHlwZTogdGV4dC9wbGFpbg0KDQpIZXkgQm9iLiBFSVRONDEgcm9ja3Mh
+DQoEFP3aSBp09+APZNOfb6wnVO+88NeA
+

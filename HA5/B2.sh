@@ -5,7 +5,7 @@ function cms_verify_mail {
   openssl cms -digest_verify -in $2.txt 2> $2.verify | sed "3q;d"
   sed '1q;d' $2.verify
   echo
-  rm $2.txt
+  rm $2.verify
 }
 
 mail1="inputs/B2/mail1"
