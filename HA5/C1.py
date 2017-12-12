@@ -43,12 +43,6 @@ def quadratic_residue(pub_id, m):
         a = sha1(a).digest()
     return b_int(a)
 
-def get_t(m):
-    t = randrange(0, m)
-    while jacobi(t, m) != 1:
-        t = randrange(0, m)
-    return t
-
 def decrypt_bits(encr_bits, r, m):
     decr_bits = [1 if jacobi(int(s, 16) + 2 * r, m) > 0 else 0 for s in encr_bits]
     return int(''.join(map(str, decr_bits)), 2)
@@ -57,8 +51,6 @@ def IBE(pub_id, p, q, encr_bits):
     m = p * q
     a = quadratic_residue(pub_id, m)
     r = PKG(a, m, p, q)
-    t = get_t(m)
-    s = (t + a * mulinv(t, m)) % m
     code = decrypt_bits(encr_bits, r, m)
     return r, code
 
