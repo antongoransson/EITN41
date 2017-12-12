@@ -23,22 +23,24 @@ def bytes_needed(i):
         return 1
     return (i.bit_length() + 7) // 8
 
-def TLV_DER_INT(i):
-    l = bytes_needed(i)
-    i_str = hex2(i)
-    if int(i_str[0], 16) >= 0b1000: #1000 or larger
-        i_str = '00' + i_str
-        l += 1
-    l_str = hex2(l)
-    if l > 0x7f:
-        l_str = '8' + str(len(l_str) // 2) + l_str
-    return '02' + l_str + i_str
+def DER_encode_len(l):
+    l_hex = hex2(l)
+    if l >= 0x80:
+        l_hex = '8{}{}'.format(len(l_hex) // 2, l_hex)
+    return l_hex
 
-def TLV_DER_CERT(seq):
-    l = hex2(len(seq) // 2 )
-    if len(seq) // 2 > 0x7f:
-        l = '8' + str(len(l) // 2) + l
-    return unhexlify('30' + l + seq) # 30 = certificate
+def DER_encode_int(i):
+    l = bytes_needed(i)
+    i_hex = hex2(i)
+    if int(i_hex[0], 16) >= 0b1000:
+        i_hex = '00{}'.format(i_hex)
+        l += 1
+    l_hex = DER_encode_len(l)
+    return '02{}{}'.format(l_hex, i_hex)
+
+def DER_encode_cert(seq):
+    l_hex = DER_encode_len(len(seq) // 2)
+    return unhexlify('30{}{}'.format(l_hex, seq)) # 30 = certificate
 
 def calc_priv_key(p, q, e, version = 0):
     n = p * q
@@ -47,11 +49,11 @@ def calc_priv_key(p, q, e, version = 0):
     exp2 = d % (q - 1)
     coeff = mulinv(q, p)
 
-    priv_key = map(TLV_DER_INT, [version, n, e, d, p, q, exp1, exp2, coeff])
-    cert = TLV_DER_CERT(''.join(priv_key))
-    key_out = b64encode(cert).decode('utf8')
-    key_out= ''.join(['\n' *( i % 64 == 0 and i != 0) + s for i, s in enumerate(key_out)])
-    return b64encode(cert).decode('utf8'), key_out# 64 charcters per line
+    priv_key = map(DER_encode_int, [version, n, e, d, p, q, exp1, exp2, coeff])
+    cert = DER_encode_cert(''.join(priv_key))
+    enc_cert = b64encode(cert).decode('utf8')
+    key_out = ''.join(['\n' * (i % 64 == 0 and i != 0) + s for i, s in enumerate(enc_cert)])
+    return enc_cert, key_out # 64 charcters per line
 
 if __name__ == '__main__':
     p = input('p: ')
