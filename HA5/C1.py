@@ -37,8 +37,8 @@ def mulinv(b, n):
 def PKG(a, m, p, q):
     return pow(a, (m + 5 - p - q) // 8, m)
 
-def quadratic_residue(identity, m):
-    a = sha1(identity.encode('utf8')).digest()
+def quadratic_residue(pub_id, m):
+    a = sha1(pub_id.encode('utf8')).digest()
     while jacobi(b_int(a), m) != 1:
         a = sha1(a).digest()
     return b_int(a)
@@ -49,27 +49,26 @@ def get_t(m):
         t = randrange(0, m)
     return t
 
-def decrypt_bits(encrypted_bits, r, m):
-    b = [jacobi(int(s, 16) + 2 * r, m) for s in encrypted_bits]
-    b = [0 if x < 0 else x for x in b]
-    return int(''.join(map(str, b)), 2)
+def decrypt_bits(encr_bits, r, m):
+    decr_bits = [1 if jacobi(int(s, 16) + 2 * r, m) > 0 else 0 for s in encr_bits]
+    return int(''.join(map(str, decr_bits)), 2)
 
-def IBE(identity, p, q, encrypted_bits):
+def IBE(pub_id, p, q, encr_bits):
     m = p * q
-    a = quadratic_residue(identity, m)
+    a = quadratic_residue(pub_id, m)
     r = PKG(a, m, p, q)
     t = get_t(m)
     s = (t + a * mulinv(t, m)) % m
-    code = decrypt_bits(encrypted_bits, r, m)
-    print('r:', format(r, 'x'))
-    print('CODE:', code)
-
+    code = decrypt_bits(encr_bits, r, m)
+    return r, code
 
 if __name__ == '__main__':
-    identity = input('')
+    pub_id = input('')
     p, q = int(input(''), 16), int(input(''), 16)
-    encrypted_bits = []
+    encr_bits = []
     while True:
-        try: encrypted_bits.append((input('')))
+        try: encr_bits.append((input('')))
         except: break
-    IBE(identity, p, q, encrypted_bits)
+    r, code = IBE(pub_id, p, q, encr_bits)
+    print('r:', format(r, 'x'))
+    print('CODE:', code)
