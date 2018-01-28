@@ -1,2 +1,2 @@
-# EITN41 Adnvaced Web Security
+# EITN41 Advanced Web Security
 Assignments in Advanced Web Security
